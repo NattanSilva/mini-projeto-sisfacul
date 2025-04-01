@@ -1,16 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define MAX 60
 
 // Implementação de tipos de dados
 typedef struct materia {
   char nome[80];
-  float nota;
 } T_Materia;
+
+// Implemtação do Nó
+typedef struct no {
+  T_Materia dado;
+  struct no * prox;
+}T_NO;
 
 typedef struct aluno {
   int rgm;
-  int n;
+  T_NO * cabeca;
 } T_Aluno;
 
 typedef struct sala {
@@ -25,12 +31,53 @@ T_Sala iniciarSala() {
   return sala;
 }
 
+// Função responsável por criar um novo Nó
+T_NO * criarNo() {
+  T_NO * no = (T_NO *) malloc(sizeof(T_NO));
+
+  if (no) {
+    no->prox = NULL;
+  }
+
+  return no;
+}
+
+int listaDeAlunosVazia(T_Sala * sala) {
+  return (sala->n == -1);
+}
+
+int listaDeAlunosCheia(T_Sala * sala) {
+  return (sala->n == MAX);
+}
+
 
 void listarALunos(T_Sala * sala) {
-  int i = 0, j = 0;
-  for(i = 0; i < sala->n; i++) {
-    printf("");
+  int i = 0;
+  T_NO * aux = NULL;
+
+  if(listaDeAlunosVazia(sala)) {
+    printf("Nenhum aluno cadastrado nesta sala\n");
+    return;
   }
+
+  for(i = 0; i < sala->n + 1; i++) {
+    printf("RGM: %d\n", sala->alunos[i].rgm);
+ 
+    if(sala->alunos[i].cabeca == NULL) {
+      printf("Nenhuma disciplina cadastrada\n");
+    }else {
+      aux = sala->alunos[i].cabeca;
+      printf("Materias\n");
+      while (aux != NULL) {
+       printf("[%s]\n", aux->dado.nome);
+       aux = aux->prox;
+      }
+    }
+  }
+
+  printf("Fim da lista...\n");
+
+  return;
 }
 
 void menu(T_Sala * sala) {
@@ -50,6 +97,8 @@ void menu(T_Sala * sala) {
       break;
     case 2:
       printf("Listagem de alunos\n");
+      listarALunos(sala);
+      menu(sala);
       break;
     case 3:
       printf("Busca de alunos\n");
@@ -58,6 +107,7 @@ void menu(T_Sala * sala) {
       printf("Remocao de alunos\n");
       break;
     case 5:
+      printf("Obrigado por user nosso sistema!\n");
       printf("Saindo...\n");
       break;
     default:
@@ -70,8 +120,20 @@ void menu(T_Sala * sala) {
 
 int main() {
   T_Sala minhSala;
+  T_Materia novaMateria;
+  T_NO * novoNo;
+
+  novoNo = criarNo();
+
+  strcpy(novaMateria.nome, "Matematica");
+  novoNo->dado = novaMateria;
 
   minhSala = iniciarSala();
+  minhSala.n = 2;
+  minhSala.alunos[0].rgm = 1;
+  minhSala.alunos[0].cabeca = novoNo;
+  minhSala.alunos[1].rgm = 2;
+  minhSala.alunos[2].rgm = 3;
   menu(&minhSala);
 
   return 0;
