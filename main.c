@@ -11,6 +11,7 @@ typedef struct materia {
 // Implemtação do Nó
 typedef struct no {
   T_Materia dado;
+  float nota;
   struct no * prox;
 }T_NO;
 
@@ -61,6 +62,7 @@ void listarALunos(T_Sala * sala) {
   }
 
   for(i = 0; i < sala->n + 1; i++) {
+    printf("-----------------------------------------------\n");
     printf("RGM: %d\n", sala->alunos[i].rgm);
  
     if(sala->alunos[i].cabeca == NULL) {
@@ -69,10 +71,12 @@ void listarALunos(T_Sala * sala) {
       aux = sala->alunos[i].cabeca;
       printf("Materias\n");
       while (aux != NULL) {
-       printf("[%s]\n", aux->dado.nome);
+       printf("[%s - %.2f]\n", aux->dado.nome, aux->nota);
        aux = aux->prox;
       }
     }
+    
+    printf("-----------------------------------------------\n");
   }
 
   printf("Fim da lista...\n");
@@ -127,6 +131,7 @@ int main() {
 
   strcpy(novaMateria.nome, "Matematica");
   novoNo->dado = novaMateria;
+  novoNo->nota = 7.0;
 
   minhSala = iniciarSala();
   minhSala.n = 2;
