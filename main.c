@@ -32,7 +32,14 @@ typedef struct sala {
   int n;
 } T_Sala;
 
-// Função responsável por iniciar a sala
+/**
+ * @brief Inicializa uma sala de alunos.
+ * 
+ * Esta função inicializa uma estrutura `T_Sala`, configurando o número de alunos 
+ * como -1, o que indica que a sala ainda não possui alunos cadastrados.
+ * 
+ * @return T_Sala Retorna uma estrutura `T_Sala` inicializada, pronta para armazenar alunos.
+*/
 T_Sala iniciarSala() {
   T_Sala sala;
   sala.n = -1;
@@ -40,7 +47,16 @@ T_Sala iniciarSala() {
   return sala;
 }
 
-// Função responsável por criar um novo Nó
+/**
+ * @brief Cria um novo nó para a lista encadeada.
+ * 
+ * Esta função aloca dinamicamente memória para um novo nó da lista encadeada. 
+ * O novo nó é inicializado com o campo `prox` configurado como `NULL`, indicando 
+ * que ele não aponta para nenhum outro nó.
+ * 
+ * @return T_NO* Retorna um ponteiro para o novo nó criado. Se a alocação falhar, 
+ *               retorna `NULL`.
+*/
 T_NO * criarNo() {
   T_NO * no = (T_NO *) malloc(sizeof(T_NO));
 
@@ -51,16 +67,49 @@ T_NO * criarNo() {
   return no;
 }
 
-// Verifica se a lista de alunos esta vazia
+/**
+ * @brief Verifica se a lista de alunos está vazia.
+ * 
+ * Esta função verifica se a lista de alunos na sala está vazia, ou seja,
+ * se o número de alunos registrado é igual a -1. Esse valor indica que 
+ * não há alunos cadastrados na sala.
+ * 
+ * @param sala Ponteiro para a estrutura T_Sala que contém os alunos.
+ * @return int Retorna 1 se a lista de alunos estiver vazia (ou seja, o número de alunos é igual a -1),
+ *             e 0 caso contrário.
+*/
 int listaDeAlunosVazia(T_Sala * sala) {
   return (sala->n == -1);
 }
-// Verifica se a lista de alunos esta cheia
+
+/**
+ * @brief Verifica se a lista de alunos está cheia.
+ * 
+ * Esta função verifica se o número atual de alunos na sala atingiu o valor máximo
+ * permitido, retornando um valor booleano para indicar se a lista está cheia ou não.
+ * 
+ * @param sala Ponteiro para a estrutura T_Sala que contém os alunos.
+ * @return int Retorna 1 se a lista de alunos estiver cheia (ou seja, o número de alunos é igual a MAX), 
+ *             e 0 caso contrário.
+*/
 int listaDeAlunosCheia(T_Sala * sala) {
   return (sala->n == MAX);
 }
 
-// Implementação das função de listagem de alunos e matérias
+/**
+ * Lista todos os alunos cadastrados na sala e suas respectivas disciplinas.
+ * 
+ * @param sala  Ponteiro para a estrutura `T_Sala`, que contém a lista de alunos.
+ * 
+ * Descrição:
+ * - Verifica se a lista de alunos está vazia (`listaDeAlunosVazia(sala)`).  
+ *   - Se estiver vazia, exibe uma mensagem e retorna.  
+ * - Percorre todos os alunos da sala usando um loop `for` que vai de `0` até `sala->n` (última posição ocupada).  
+ * - Para cada aluno, exibe o **RGM** e verifica se ele possui disciplinas cadastradas.  
+ *   - Se não houver disciplinas (`cabeca == NULL`), imprime `"Nenhuma disciplina cadastrada"`.  
+ *   - Caso contrário, percorre a lista encadeada de disciplinas e exibe **nome e nota**.  
+ * - Exibe `"Fim da lista..."` ao final da listagem.   
+*/
 void listarALunos(T_Sala * sala) {
   int i = 0;
   T_NO * aux = NULL;
@@ -70,7 +119,7 @@ void listarALunos(T_Sala * sala) {
     return;
   }
 
-  for(i = 0; i < sala->n + 1; i++) {
+  for(i = 0; i <= sala->n; i++) {
     printf("-----------------------------------------------\n");
     printf("RGM: %d\n", sala->alunos[i].rgm);
  
@@ -93,9 +142,35 @@ void listarALunos(T_Sala * sala) {
   return;
 }
 
-// Função responsável por deslocar os elementos da lista de alunos 1 posição à direita
+/**
+ * Desloca os elementos da lista de alunos uma posição à direita a partir de um índice específico.
+ * 
+ * @param sala     Ponteiro para a estrutura `T_Sala`, que contém a lista de alunos.
+ * @param posicao  Índice a partir do qual os elementos serão deslocados.
+ * @return         Retorna 1 se o deslocamento for bem-sucedido.
+ *                 Retorna 0 se a posição for inválida.
+ * 
+ * Descrição:
+ * - Antes de iniciar o deslocamento, a função verifica se `posicao` é válida:
+ *   - `posicao < 0`: Não pode ser um índice negativo.
+ *   - `posicao > sala->n`: Não pode ser maior que o número de alunos.
+ *   - `posicao >= MAX`: Não pode ultrapassar o limite máximo do array.
+ * - Se a posição for inválida, retorna 0 e não realiza a operação.
+ * - Caso seja válida, desloca os elementos da lista uma posição à direita.
+ * - O deslocamento começa da última posição ocupada (`sala->n + 1`) até `posicao + 1`.
+ * - Isso cria espaço para a inserção de um novo aluno sem sobrescrever dados existentes.
+ * 
+ * ⚠️ Atenção:
+ * - Certifique-se de que `sala->n` foi atualizado corretamente antes da chamada desta função.
+ * - A função não atualiza `sala->n`, pois isso deve ser feito pela função de inserção.
+ * - O array deve ter espaço disponível para evitar estouro de memória (overflow).
+*/
 int deslocarDireita(T_Sala * sala, int posicao) {
   int i = 0;
+
+  if(posicao < 0 || posicao > sala->n || posicao >= MAX) {
+    return 0;
+  }
 
   for(i = sala->n + 1; i > posicao; i--) {
     sala->alunos[i] = sala->alunos[i - 1];
@@ -104,7 +179,22 @@ int deslocarDireita(T_Sala * sala, int posicao) {
   return 1;
 }
 
-// Função responsável por inserir um aluno na lista de alunos de forma ordenada pelo RGM
+/**
+ * Insere um aluno na lista de forma ordenada pelo RGM.
+ * 
+ * @param sala   Ponteiro para a estrutura `T_Sala`, que contém a lista de alunos.
+ * @param aluno  Estrutura `T_Aluno` contendo os dados do aluno a ser inserido.
+ * @return       Retorna a posição em que o aluno foi inserido.
+ *               Retorna -1 se a sala estiver cheia.
+ * 
+ * Descrição:
+ * - Se a sala estiver cheia, a função retorna -1, indicando erro.
+ * - Se a lista estiver vazia, insere o aluno na primeira posição e retorna 0.
+ * - Caso contrário, percorre a lista até encontrar a posição correta para manter a ordem crescente do RGM.
+ * - Se o aluno deve ser inserido no final da lista, adiciona diretamente na última posição disponível.
+ * - Se precisar inserir no meio, desloca os elementos à direita antes da inserção.
+ * - Atualiza o número de alunos (`sala->n`) após uma inserção bem-sucedida.
+ */
 int insercaoOrdenadaDeAluno(T_Sala * sala, T_Aluno aluno) {
   int posicaoParaInserir = 0;
 
@@ -134,7 +224,16 @@ int insercaoOrdenadaDeAluno(T_Sala * sala, T_Aluno aluno) {
   return posicaoParaInserir;
 }
 
-// Função responsável por cadastrar um aluno e suas matérias na sala
+/**
+ * @brief Cadastra um aluno na sala e permite adicionar suas matérias.
+ * 
+ * Esta função solicita ao usuário o RGM de um novo aluno e o adiciona à 
+ * lista ordenada de alunos na sala. Após isso, permite o cadastro de 
+ * matérias para esse aluno, armazenando-as em uma lista encadeada.
+ * 
+ * @param sala Ponteiro para a estrutura T_Sala onde os alunos estão armazenados.
+ * @return int Retorna 1 se o cadastro for bem-sucedido, 0 se a sala estiver cheia.
+*/
 int cadastrarAlunoEMaterias(T_Sala * sala) {
   T_Aluno novoAluno;
   T_Materia novaMateria;
@@ -199,7 +298,6 @@ int cadastrarAlunoEMaterias(T_Sala * sala) {
   } while(opcaoAluno);
 
   return 1;
-  
 }
 
 void menu(T_Sala * sala) {
@@ -253,19 +351,6 @@ void menu(T_Sala * sala) {
 int main() {
   T_Sala minhSala;
   minhSala = iniciarSala();
-  // T_Materia novaMateria;
-  // T_NO * novoNo;
-
-  // novoNo = criarNo();
-
-  // strcpy(novaMateria.nome, "Matematica");
-  // novoNo->dado = novaMateria;
-  // novoNo->nota = 7.0;
-  // minhSala.n = 2;
-  // minhSala.alunos[0].rgm = 1;
-  // minhSala.alunos[0].cabeca = novoNo;
-  // minhSala.alunos[1].rgm = 2;
-  // minhSala.alunos[2].rgm = 3;
   menu(&minhSala);
 
   return 0;
