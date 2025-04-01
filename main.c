@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #define MAX 60
+
+void limpaBuffer() {
+  while (getchar() != '\n');
+}
 
 // Implementação de matéria
 typedef struct materia {
@@ -104,13 +109,13 @@ int insercaoOrdenadaDeAluno(T_Sala * sala, T_Aluno aluno) {
   int posicaoParaInserir = 0;
 
   if (listaDeAlunosCheia(sala)) {
-    return 0;
+    return -1;
   }
 
   if(listaDeAlunosVazia(sala)) {
     sala->alunos[posicaoParaInserir] = aluno;
     (sala->n)++;
-    return 1;
+    return posicaoParaInserir;
   }
 
   while ((posicaoParaInserir <= sala->n) && (sala->alunos[posicaoParaInserir].rgm < aluno.rgm)) {
@@ -120,22 +125,22 @@ int insercaoOrdenadaDeAluno(T_Sala * sala, T_Aluno aluno) {
   if (posicaoParaInserir == sala->n) {
     sala->alunos[posicaoParaInserir + 1] = aluno;
     (sala->n)++;
-    return 1;
+    return posicaoParaInserir + 1;
   }
 
   deslocarDireita(sala, posicaoParaInserir);
   sala->alunos[posicaoParaInserir] = aluno;
   (sala->n)++;
-  return 1;
+  return posicaoParaInserir;
 }
 
 // Função responsável por cadastrar um aluno e suas matérias na sala
 int cadastrarAlunoEMaterias(T_Sala * sala) {
   T_Aluno novoAluno;
-  // T_Materia novaMateria;
-  // float notaMateria = 0.0;
-  // char opcaoAluno[1], opcaoMateria[1];
-  char opcaoAluno[2];
+  T_Materia novaMateria;
+  T_NO * novoNo;
+  float notaMateria = 0.0;
+  int opcaoAluno = 0, opcaoMateria = 0;
 
   if(listaDeAlunosCheia(sala)) {
     printf("Sala cheia\n");
@@ -146,28 +151,52 @@ int cadastrarAlunoEMaterias(T_Sala * sala) {
     printf("Digite o RGM do aluno: ");
     scanf("%d", &novoAluno.rgm);
     novoAluno.cabeca = NULL;
+    limpaBuffer();
 
     int respostaAluno = insercaoOrdenadaDeAluno(sala, novoAluno);
 
-    // do {
-    //   printf("Digite o nome da materia: ");
-    //   scanf("%s", &novaMateria.nome);
-    //   printf("Digite a nota da materia: "); 
-    //   scanf("%f", &notaMateria);
-
-    //   printf("Mais disciplina? (S/N): ");
-    //   scanf("%c", &opcaoMateria);
-    // } while (strcmp(opcaoMateria, 'S') == 0 || strcmp(opcaoMateria, 'S') == 0);
-
-    if(respostaAluno) {
-      printf("%d cadastrado com sucesso\n", novoAluno.rgm);
+    if(respostaAluno < 0) {
+      printf("ERRO - Sala cheia\n");
+      return 0;
     }
 
-    printf("Mais aluno? (S/N): ");
-    scanf("%s", opcaoAluno);
-    fflush(stdin);
+    do {
+      printf("Digite o nome da materia: ");
+      scanf("%[^\n]", novaMateria.nome);
+      limpaBuffer();
+      printf("Digite a nota da materia: "); 
+      scanf("%f", &notaMateria);
+      limpaBuffer();
+
+      novoNo = criarNo();
+      novoNo->dado = novaMateria;
+      novoNo->nota = notaMateria;
+
+      if(sala->alunos[respostaAluno].cabeca == NULL) {
+        sala->alunos[respostaAluno].cabeca = novoNo;
+      } else {
+        T_NO * aux = sala->alunos[respostaAluno].cabeca;
+        
+        // Busca pelo ultimo nó com o valor do proximo no igual a NULL
+        while (aux->prox != NULL) {
+          aux = aux->prox;
+        }
+
+        aux->prox = novoNo;
+      }
+  
+      printf("Mais disciplina? [1 para Sim / 0 para Nao]: ");
+      scanf("%d", &opcaoMateria);
+      limpaBuffer();
+    } while(opcaoMateria);
     
-  } while ((strcmp(opcaoAluno, "S") == 0) || (strcmp(opcaoAluno, "s") == 0));
+
+
+    printf("Mais aluno? [1 para Sim / 0 para Nao]: ");
+    scanf("%d", &opcaoAluno);
+    limpaBuffer();
+    
+  } while(opcaoAluno);
 
   return 1;
   
@@ -175,41 +204,50 @@ int cadastrarAlunoEMaterias(T_Sala * sala) {
 
 void menu(T_Sala * sala) {
   int opcao = 0;
-  printf("-------------Menu-------------\n");
+
+  printf("-------------------Menu------------------------\n");
   printf("1 - Inserir alunos\n");
   printf("2 - Listar dados dos alunos\n");
   printf("3 - Buscar aluno pelo RGM\n");
   printf("4 - Remover aluno pelo RGM\n");
   printf("5 - Sair\n");
-  printf("Digite a opcao desejada: ");
+  printf("Digite a opcao desejada [1-5]: ");
   scanf("%d", &opcao);
+  limpaBuffer();
 
   switch (opcao) {
     case 1:
+      printf("-----------------------------------------------\n");
       cadastrarAlunoEMaterias(sala);
       menu(sala);
       break;
     case 2:
+      printf("-----------------------------------------------\n");
       printf("Listagem de alunos\n");
       listarALunos(sala);
       menu(sala);
       break;
     case 3:
+      printf("-----------------------------------------------\n");
       printf("Busca de alunos\n");
       break;
     case 4:
+      printf("-----------------------------------------------\n");
       printf("Remocao de alunos\n");
       break;
     case 5:
-      printf("Obrigado por user nosso sistema!\n");
+      printf("-----------------------------------------------\n");
+      printf("Obrigado por usar nosso sistema!\n");
       printf("Saindo...\n");
-      break;
+      return;
     default:
-      printf("Opcao invalida\n");
+      printf("-----------------------------------------------\n");
+      printf("* Erro - Opcao invalida *\n");
       menu(sala);
       break;
   }
-
+  
+  return;
 }
 
 int main() {
