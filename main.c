@@ -13,12 +13,12 @@ typedef struct materia {
   char nome[80];
 } T_Materia;
 
-// Implemtação do Nó
+// Implementação do Nó
 typedef struct no {
   T_Materia dado;
   float nota;
   struct no * prox;
-}T_NO;
+} T_NO;
 
 // Implementação de Aluno
 typedef struct aluno {
@@ -125,12 +125,12 @@ void listarALunos(T_Sala * sala) {
  
     if(sala->alunos[i].cabeca == NULL) {
       printf("Nenhuma disciplina cadastrada\n");
-    }else {
+    } else {
       aux = sala->alunos[i].cabeca;
       printf("Materias\n");
       while (aux != NULL) {
-       printf("[%s - %.2f]\n", aux->dado.nome, aux->nota);
-       aux = aux->prox;
+        printf("[%s - %.2f]\n", aux->dado.nome, aux->nota);
+        aux = aux->prox;
       }
     }
 
@@ -140,6 +140,57 @@ void listarALunos(T_Sala * sala) {
   printf("Fim da lista...\n");
 
   return;
+}
+
+/**
+ * @brief Busca um aluno pelo RGM na sala.
+ * 
+ * Esta função percorre a lista de alunos na sala e verifica se o RGM informado
+ * corresponde ao RGM de algum aluno. Caso o aluno seja encontrado, são exibidas 
+ * as informações do aluno, incluindo as matérias e suas respectivas notas. Caso contrário, 
+ * é exibida uma mensagem informando que o aluno não foi encontrado.
+ * 
+ * @param sala Ponteiro para a estrutura T_Sala onde os alunos estão armazenados.
+ * @param rgm  O RGM do aluno a ser buscado.
+ */
+void buscarAlunoPorRGM(T_Sala * sala, int rgm) {
+  int i = 0;
+  T_NO * aux = NULL;
+  int encontrado = 0;
+
+  // Verifica se a lista de alunos está vazia
+  if (listaDeAlunosVazia(sala)) {
+    printf("Nenhum aluno cadastrado nesta sala.\n");
+    return;
+  }
+
+  // Percorre a lista de alunos
+  for (i = 0; i <= sala->n; i++) {
+    // Se o RGM do aluno for encontrado
+    if (sala->alunos[i].rgm == rgm) {
+      encontrado = 1;
+      printf("Aluno encontrado: \n");
+      printf("RGM: %d\n", sala->alunos[i].rgm);
+
+      // Verifica se o aluno tem matérias cadastradas
+      if (sala->alunos[i].cabeca == NULL) {
+        printf("Nenhuma disciplina cadastrada.\n");
+      } else {
+        aux = sala->alunos[i].cabeca;
+        printf("Materias: \n");
+        while (aux != NULL) {
+          printf("[%s - %.2f]\n", aux->dado.nome, aux->nota);
+          aux = aux->prox;
+        }
+      }
+      break;
+    }
+  }
+
+  // Se não encontrou o aluno
+  if (!encontrado) {
+    printf("Aluno com RGM %d não encontrado.\n", rgm);
+  }
 }
 
 /**
@@ -290,7 +341,6 @@ int cadastrarAlunoEMaterias(T_Sala * sala) {
     } while(opcaoMateria);
     
 
-
     printf("Mais aluno? [1 para Sim / 0 para Nao]: ");
     scanf("%d", &opcaoAluno);
     limpaBuffer();
@@ -328,6 +378,11 @@ void menu(T_Sala * sala) {
     case 3:
       printf("-----------------------------------------------\n");
       printf("Busca de alunos\n");
+      int rgmBusca;
+      printf("Digite o RGM do aluno a ser buscado: ");
+      scanf("%d", &rgmBusca);
+      buscarAlunoPorRGM(sala, rgmBusca);  // Chama a função de busca
+      menu(sala);
       break;
     case 4:
       printf("-----------------------------------------------\n");
