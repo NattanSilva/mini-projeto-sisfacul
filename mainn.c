@@ -1,81 +1,44 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+/**
+ * @brief Remove um aluno da sala pelo RGM.
+ * 
+ * Esta função procura o aluno com o RGM informado. Se encontrado:
+ * - Libera todas as matérias (lista encadeada) desse aluno.
+ * - Remove o aluno da lista sequencial (vetor).
+ * - Atualiza a quantidade total de alunos na sala.
+ * 
+ * @param sala Ponteiro para a estrutura T_Sala.
+ * @param rgm  RGM do aluno a ser removido.
+ * @return int 1 se remover com sucesso, 0 se não encontrar.
+*/
+int removerAlunoPorRGM(T_Sala * sala, int rgm) {
+  if (listaDeAlunosVazia(sala)) {
+    printf("Nenhum aluno cadastrado.\n");
+    return 0;
+  }
 
-#define MAX 60
-
-// Definição das estruturas
-typedef struct materia {
-    char nome[80];
-} T_Materia;
-
-typedef struct no {
-    T_Materia dado;
-    float nota;
-    struct no *prox;
-} T_NO;
-
-typedef struct aluno {
-    int rgm;
-    T_NO *cabeca;
-} T_Aluno;
-
-typedef struct sala {
-    T_Aluno alunos[MAX];
-    int n;
-} T_Sala;
-
-// Função para limpar o buffer de entrada
-void limpaBuffer() {
-    while (getchar() != '\n');
-}
-
-// Função para verificar se a lista de alunos está vazia
-int listaDeAlunosVazia(T_Sala *sala) {
-    return (sala->n == -1);
-}
-
-// Função para remover um aluno pelo RGM
-void removerAlunoPorRGM(T_Sala *sala, int rgm) {
-    if (listaDeAlunosVazia(sala)) {
-        printf("Nenhum aluno cadastrado nesta sala.\n");
-        return;
-    }
-
-    int indice = -1;
-    for (int i = 0; i <= sala->n; i++) {
-        if (sala->alunos[i].rgm == rgm) {
-            indice = i;
-            break;
-        }
-    }
-
-    if (indice == -1) {
-        printf("Aluno com RGM %d não encontrado.\n", rgm);
-        return;
-    }
-
-    // Liberar a memória das disciplinas associadas
-    T_NO *atual = sala->alunos[indice].cabeca;
-    while (atual != NULL) {
-        T_NO *temp = atual;
+  int i, j;
+  for (i = 0; i <= sala->n; i++) {
+    if (sala->alunos[i].rgm == rgm) {
+      // Libera lista encadeada de matérias
+      T_NO * atual = sala->alunos[i].cabeca;
+      T_NO * temp;
+      while (atual != NULL) {
+        temp = atual;
         atual = atual->prox;
-        free(temp);
+        free(temp); // libera cada nó
+      }
+
+      // Desloca os alunos à esquerda (remove o aluno do vetor)
+      for (j = i; j < sala->n; j++) {
+        sala->alunos[j] = sala->alunos[j + 1];
+      }
+
+      sala->n--; // atualiza o número de alunos
+      printf("Aluno com RGM %d removido com sucesso!\n", rgm);
+      return 1;
     }
+  }
 
-    // Remover o aluno da lista sequencial
-    for (int i = indice; i < sala->n; i++) {
-        sala->alunos[i] = sala->alunos[i + 1];
-    }
-
-    // Atualizar o contador de alunos
-    sala->n--;
-
-    // Se após a remoção não houver mais alunos, redefina sala->n para -1
-    if (sala->n < 0) {
-        sala->n = -1;
-    }
-
-    printf("Aluno com RGM %d removido com sucesso.\n", rgm);
+  printf("Aluno com RGM %d não encontrado.\n", rgm);
+  return 0;
 }
-
