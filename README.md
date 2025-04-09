@@ -30,9 +30,20 @@ variável para cada aluno). Desenvolver uma aplicação que:</p>
 
 ### 👥 Equipe
 
-<ul style="display: flex; gap: 2rem; list-style: none;">
-  <li style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px;">
-    <img style="width: 64px; height: 64px; border-radius: 50%;" src="https://github.com/NattanSilva.png" alt="Nattan Silva">
-    <a href="https://github.com/NattanSilva" style="text-decoration: none; font-family: sans-serif; font-weight: 500; color: white;">Nattan Silva</a>
-  </li>
-</ul>
+- <a href="https://github.com/NattanSilva" target="blank">
+    <img style="border-radius: 16px;" width="80px" height="80px" src="https://github.com/NattanSilva.png" alt="Nattan Silva"/>
+    <br>
+    Nattan Silva
+  </a>
+
+- <a href="https://github.com/Dereck234" target="blank">
+    <img style="border-radius: 16px;" width="80px" height="80px" src="https://github.com/Dereck234.png" alt="Dereck Patrick"/>
+    <br> 
+    Dereck Patrick
+  </a>
+
+- <a href="https://github.com/EduardoCoura" target="blank">
+    <img style="border-radius: 16px;" width="80px" height="80px" src="https://github.com/EduardoCoura.png" alt="Eduardo Coura"/>
+    <br> 
+    Eduardo Coura
+  </a>
